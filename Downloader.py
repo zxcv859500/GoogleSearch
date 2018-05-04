@@ -7,19 +7,28 @@ class Downloader:
      #Setting(경로) : 크롬 기본 옵션 설정, 다운로드 경로 설정
      def Setting(self, path):
           self.options = webdriver.ChromeOptions()
-
+          self.path = path
           profile = {"plugins.plugins_list": [{"enabled": False, "name": "Chrome PDF Viewer"}],
-                     "download.default_directory": path, "download.extensions_to_oepn": "applications/pdf"}
+                     "download.default_directory": path, "download.extensions_to_oepn": "applications/pdf",
+                     'download.prompt_for_download': False,
+                     'download.directory_upgrade' : True,
+                     'safebrowsing.enabled' : False,
+                     'safebrowsing.disable_download_protection': True}
+
           self.options.add_experimental_option("prefs", profile)
 
-          #self.options.add_argument('--no-sandbox')
-          #self.options.add_argument('--headless')
-          #self.options.add_argument('--window-size=1920x1080')
-          #self.options.add_argument('--disable-gpu')
+          self.options.add_argument('--no-sandbox')
+          self.options.add_argument('--headless')
+          self.options.add_argument('--window-size=1920x1080')
+          self.options.add_argument('--disable-gpu')
 
      #GetSearchPage(검색어) : 검색 결과 첫 페이지로 이동
      def GetSearchPage(self, keyword):
           self.browser = webdriver.Chrome('./chromedriver.exe', chrome_options=self.options)
+          self.browser.command_executor._commands["send_command"] = ("POST", '/session/$sessionId/chromium/send_command')
+          self.browser.desired_capabilities['browserName'] = 'ur mum'
+          params = {'cmd': 'Page.setDownloadBehavior', 'params' : {'behavior': 'allow', 'downloadPath' : self.path}}
+          self.browser.execute("send_command", params)
           self.browser.get('http://www.google.co.kr')
           self.browser.implicitly_wait(3)
 
