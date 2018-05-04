@@ -1,18 +1,34 @@
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
+import time
 
 class Downloader:
      def  __init__(self):
+          self.path = "C:\\Users\\조나단\\Desktop\\Test\\"
+
           self.options = webdriver.ChromeOptions()
-          self.options.add_argument('headless')
-          self.options.add_argument('window')
-          self.options.add_argument('disable-gpu')
+
+          profile = {"plugins.plugins_list": [{"enabled": False, "name": "Chrome PDF Viewer"}],
+                    "download.default_directory": self.path, "download.extensions_to_open": "applications/pdf"}
+          self.options.add_experimental_option("prefs", profile)
+
+          #self.options.add_argument('headless')
+          #self.options.add_argument('window')
+          #self.options.add_argument('disable-gpu')
+          '''
+          prefs = {
+               'profile.default_content_seetings.popups' : 0,
+               'download.default_directroy' : 'C:\\Users\\조나단\\Desktop\\',
+               'directory_upgrade' : True,
+               'extensions_to_open' : ""
+          }
+          '''
+          #self.options.add_experimental_option('prefs', prefs)
 
           self.browser = webdriver.Chrome('./chromedriver.exe', chrome_options=self.options)
-          self.browser.get('https://www.google.co.kr')
+          self.browser.get('http://www.google.co.kr')
           self.browser.implicitly_wait(3)
 
-          self.path = str
 
      def GetSearchPage(self, keyword):
           search_keyword = keyword + ' filetype:pdf'
@@ -29,13 +45,20 @@ class Downloader:
           self.browser.get_screenshot_as_file('screenshot.png')
 
      def Download(self):
-          pass
+
+          for idx in range(1, 11):
+               self.browser.find_element_by_xpath('//*[@id="rso"]/div/div/div[{}]/div/div/h3/a'\
+                                                  .format(idx)).click()
+               time.sleep(1)
+
+          self.browser.get_screenshot_as_file('screenshot.png')
 
      def SetPath(self, path):
           pass
 
 down = Downloader()
-down.GetSearchPage('감사')
+down.GetSearchPage('블랙핑크')
+down.Download()
 
 '''
 if __name__ == '__main__':
@@ -48,6 +71,6 @@ if __name__ == '__main__':
      browser.get('http://www.ubuntu.com/')
      browser.implicitly_wait(3)
      browser.get_screenshot_as_file('naver_main_headless.png')
-
+     
      browser.quit()
 '''
