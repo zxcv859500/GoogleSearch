@@ -1,4 +1,4 @@
-import sys
+import os
 from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
 from pdfminer.pdfpage import PDFPage
 from pdfminer.converter import TextConverter
@@ -36,5 +36,15 @@ def mktext(filename, data):
 
     pass
 
+def DeleteExcept(filename):
+
+    exname = filename.split(r"\\")[-1].split('.')[-1]
+
+    print(exname)
+
+    if exname != 'pdf':
+       os.remove(filename)
+
 if __name__ == '__main__':
-    Extractor('C:\\Users\\조나단\\Desktop\\Test\\KLC_대회규정.pdf', '퍼즈')
+    #Extractor('C:\\Users\\조나단\\Desktop\\Test\\KLC_대회규정.pdf', '퍼즈')
+    DeleteExcept('C:\\Users\\조나단\\Desktop\\Test\\ac_downFile.asp')
