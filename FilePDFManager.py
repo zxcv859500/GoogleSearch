@@ -1,7 +1,7 @@
 import sys
 from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
 from pdfminer.pdfpage import PDFPage
-from pdfminer.converter import XMLConverter, HTMLConverter, TextConverter
+from pdfminer.converter import TextConverter
 from pdfminer.layout import LAParams
 import io
 
@@ -19,7 +19,22 @@ def Extractor(file, keyword):
         interpreter.process_page(page)
         data = retstr.getvalue()
 
-    print(data)
+    texts = str(data)
+    print(texts)
+    print(texts.split('.'))
+
+    res = []
+
+    for text in texts.split('.'):
+        if keyword in text:
+            res.append(text)
+            print(text)
+
+    return res
+
+def mktext(filename, data):
+
+    pass
 
 if __name__ == '__main__':
-    Extractor('C:\\Users\\조나단\\Desktop\\Test\\KLC_대회규정.pdf', '')
+    Extractor('C:\\Users\\조나단\\Desktop\\Test\\KLC_대회규정.pdf', '퍼즈')

@@ -25,7 +25,8 @@ class Downloader:
      #GetSearchPage(검색어) : 검색 결과 첫 페이지로 이동
      def GetSearchPage(self, keyword):
           self.browser = webdriver.Chrome('./chromedriver.exe', chrome_options=self.options)
-          self.browser.command_executor._commands["send_command"] = ("POST", '/session/$sessionId/chromium/send_command')
+          self.browser.command_executor._commands["send_command"] = ("POST",
+                                                                     '/session/$sessionId/chromium/send_command')
           self.browser.desired_capabilities['browserName'] = 'ur mum'
           params = {'cmd': 'Page.setDownloadBehavior', 'params' : {'behavior': 'allow', 'downloadPath' : self.path}}
           self.browser.execute("send_command", params)
@@ -63,7 +64,6 @@ class Downloader:
                          Error_cnt += 1
                          idx -= 1
 
-
                     idx += 1
 
                     time.sleep(2)
@@ -82,5 +82,5 @@ class Downloader:
 if __name__ == '__main__':
      down = Downloader()
      down.Setting('C:\\Users\\조나단\\Desktop\\Test\\')
-     down.GetSearchPage('아니 진자 제발 적은 것좀 나와라')
+     down.GetSearchPage('롤')
      down.Download()
