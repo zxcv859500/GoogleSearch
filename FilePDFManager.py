@@ -40,11 +40,24 @@ def DeleteExcept(filename):
 
     exname = filename.split(r"\\")[-1].split('.')[-1]
 
-    print(exname)
+    if exname != 'pdf' and exname != 'PDF':
+        os.remove(filename)
+        print(filename.split(r'\\')[-1] + ' delete complete')
 
-    if exname != 'pdf':
-       os.remove(filename)
+def DeleteFile(path, filename):
+
+    filepath = path + '\\' + filename
+
+    os.remove(filepath)
+
+def GetCleanFileList(path):
+
+    file_list = os.listdir(path)
+
+    for file in file_list:
+
+        DeleteExcept(path + '\\' + file)
 
 if __name__ == '__main__':
     #Extractor('C:\\Users\\조나단\\Desktop\\Test\\KLC_대회규정.pdf', '퍼즈')
-    DeleteExcept('C:\\Users\\조나단\\Desktop\\Test\\ac_downFile.asp')
+    GetCleanFileList('C:\\Users\\조나단\\Desktop\\Test')
