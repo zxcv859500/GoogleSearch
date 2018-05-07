@@ -32,15 +32,23 @@ def Extractor(file, keyword):
 
     return res
 
-def mktext(filename, data):
+def GetFileList(path):
 
-    pass
+    file_list = os.listdir(path)
+
+    return file_list
+
+def mktext(path, filename, data):
+
+    with open(path+'\\'+filename+'.txt', 'w') as f:
+        for line in data:
+            f.write(line)
 
 def DeleteExcept(filename):
 
     exname = filename.split(r"\\")[-1].split('.')[-1]
 
-    if exname != 'pdf' and exname != 'PDF':
+    if exname != 'pdf' and exname != 'PDF' and exname != 'txt':
         os.remove(filename)
         print(filename.split(r'\\')[-1] + ' delete complete')
 

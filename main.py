@@ -7,28 +7,33 @@
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import uic
 from Download_Manager import *
 import FilePDFManager
 
 class Ui_MainWindow(object):
+
     def setupUi(self, MainWindow):
+
         MainWindow.setObjectName("MainWindow")
         MainWindow.setEnabled(True)
         MainWindow.resize(299, 435)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
-        self.textEdit_Search = QtWidgets.QTextEdit(self.centralwidget)
+        #self.textEdit_Search = QtWidgets.QTextEdit(self.centralwidget)
+        self.textEdit_Search = QtWidgets.QLineEdit(self.centralwidget)
         self.textEdit_Search.setGeometry(QtCore.QRect(10, 10, 221, 21))
-        self.textEdit_Search.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self.textEdit_Search.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        #self.textEdit_Search.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        #self.textEdit_Search.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.textEdit_Search.setObjectName("textEdit_Search")
         self.pushButton = QtWidgets.QPushButton(self.centralwidget)
         self.pushButton.setGeometry(QtCore.QRect(240, 10, 51, 21))
         self.pushButton.setObjectName("pushButton")
-        self.textEdit_File = QtWidgets.QTextEdit(self.centralwidget)
+        #self.textEdit_File = QtWidgets.QTextEdit(self.centralwidget)
+        self.textEdit_File = QtWidgets.QLineEdit(self.centralwidget)
         self.textEdit_File.setGeometry(QtCore.QRect(70, 40, 161, 21))
-        self.textEdit_File.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self.textEdit_File.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        #self.textEdit_File.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        #self.textEdit_File.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.textEdit_File.setObjectName("textEdit_File")
         self.toolButton = QtWidgets.QToolButton(self.centralwidget)
         self.toolButton.setGeometry(QtCore.QRect(240, 40, 27, 18))
@@ -42,10 +47,11 @@ class Ui_MainWindow(object):
         self.pushButton_Extract = QtWidgets.QPushButton(self.centralwidget)
         self.pushButton_Extract.setGeometry(QtCore.QRect(240, 330, 51, 23))
         self.pushButton_Extract.setObjectName("pushButton_Extract")
-        self.textEdit_Search_2 = QtWidgets.QTextEdit(self.centralwidget)
+        #self.textEdit_Search_2 = QtWidgets.QTextEdit(self.centralwidget)
+        self.textEdit_Search_2 = QtWidgets.QLineEdit(self.centralwidget)
         self.textEdit_Search_2.setGeometry(QtCore.QRect(10, 330, 221, 21))
-        self.textEdit_Search_2.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self.textEdit_Search_2.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        #self.textEdit_Search_2.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        #self.textEdit_Search_2.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.textEdit_Search_2.setObjectName("textEdit_Search_2")
         self.pushButton_Delete = QtWidgets.QPushButton(self.centralwidget)
         self.pushButton_Delete.setGeometry(QtCore.QRect(240, 360, 50, 23))
@@ -58,6 +64,11 @@ class Ui_MainWindow(object):
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
+
+        self.pushButton.clicked.connect(self.searchbtn_click)
+        self.pushButton_Delete.clicked.connect(self.deletebtn_click)
+        self.pushButton_Extract.clicked.connect(self.extractbtn_click)
+        self.toolButton.clicked.connect(self.filebtn_click)
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -72,16 +83,49 @@ class Ui_MainWindow(object):
         self.pushButton_Delete.setText(_translate("MainWindow", "삭제"))
 
     def searchbtn_click(self):
-        pass
+
+        if self.textEdit_Search.text() == '':
+            QtWidgets.QMessageBox.about(MainWindow, 'Error', '빈 칸을 채워주세요')
+
+        elif self.textEdit_File.text() == '':
+            QtWidgets.QMessageBox.about(MainWindow, 'Error', '폴더를 선택해주세요')
+
+        else:
+            download_manager = Download_Manager()
+            while(1):
+                self.refresh_list()
+                flag = download_manager.download()
+
+                if flag == True:
+                    download_manager.page.DriverQuit()
+                    break
+
+
 
     def filebtn_click(self):
-        pass
+
+        fname = QtWidgets.QFileDialog.getExistingDirectory(MainWindow)
+        self.textEdit_File.setText(fname)
+        self.path = fname
+
+        self.refresh_list()
 
     def deletebtn_click(self):
         pass
 
     def extractbtn_click(self):
         pass
+
+    def refresh_list(self):
+
+        path = str(self.path)
+
+        path.replace('/', '\\')
+
+        file_list = FilePDFManager.GetFileList(path)
+
+        for file in file_list:
+            pass #여기까지
 
 if __name__ == "__main__":
     import sys
