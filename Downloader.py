@@ -1,8 +1,14 @@
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
+from selenium.common.exceptions import *
 import time
 
 class Downloader:
+
+     def __init__(self):
+
+          self.Current_Page = str
+          self.Error_Count = 0
 
      #Setting(경로) : 크롬 기본 옵션 설정, 다운로드 경로 설정
      def Setting(self, path):
@@ -25,7 +31,8 @@ class Downloader:
      #GetSearchPage(검색어) : 검색 결과 첫 페이지로 이동
      def GetSearchPage(self, keyword):
           self.browser = webdriver.Chrome('./chromedriver.exe', chrome_options=self.options)
-          self.browser.command_executor._commands["send_command"] = ("POST", '/session/$sessionId/chromium/send_command')
+          self.browser.command_executor._commands["send_command"] = ("POST",
+                                                                     '/session/$sessionId/chromium/send_command')
           self.browser.desired_capabilities['browserName'] = 'ur mum'
           params = {'cmd': 'Page.setDownloadBehavior', 'params' : {'behavior': 'allow', 'downloadPath' : self.path}}
           self.browser.execute("send_command", params)
@@ -40,47 +47,44 @@ class Downloader:
           search_bar.send_keys(Keys.ENTER)
           self.browser.implicitly_wait(3)
 
-     #Donwload() : 페이지 안의 모든 검색 결과를 다운 한 후 다음 검색결과 페이지로 넘어감
-     def Download(self):
+     def Click_NextBtn(self):
 
-          while(1):
-               link = self.browser.current_url
-               Error_cnt = 0
+          self.next_btn.click()
 
-               idx = 1
-               while(1):
-                    if idx == 11:
-                         break
+     #Donwload() : 해당 페이지의 idx 번째 pdf 다운로드
+     def Download(self, idx):
 
-                    if Error_cnt >= 11:
-                         return False
-                    try:
-                         self.browser.find_element_by_xpath('//*[@id="rso"]/div/div/div[{}]/div/div/h3/a'\
+          try:
+               self.browser.find_element_by_xpath('//*[@id="rso"]/div/div/div[{}]/div/div/h3/a'\
                                                        .format(idx)).click()
-                    except:
-                         self.browser.get(link)
-                         self.browser.implicitly_wait(3)
-                         Error_cnt += 1
-                         idx -= 1
+               time.sleep(0.5)
+          except NoSuchElementException:
+               print('Index numbder({}): No such element'.format(idx))
+               return False
+          return True
 
+     #현재 검색 페이지의 다음 버튼을 얻고 Current_Page에 현재 링크 주소 저장
+     def Page_Surf(self):
 
-                    idx += 1
+          self.Current_Page = self.browser.current_url
+          try:
+               self.next_btn = self.browser.find_element_by_xpath('//*[@id="pnnext"]')
+          except NoSuchElementException:
+               print('NextBtn does not exist')
+               return False
+          return True
 
-                    time.sleep(2)
+     def Refresh(self):
 
-               self.browser.get(link)
-               self.browser.implicitly_wait(3)
-               try:
-                    next_btn = self.browser.find_element_by_xpath('//*[@id="pnnext"]')
-               except:
-                    print('Cannot find next button')
-                    return False
+          self.browser.get(self.Current_Page)
+          self.browser.implicitly_wait(3)
 
-               next_btn.click()
+     def DriverQuit(self):
 
+          self.browser.quit()
 
 if __name__ == '__main__':
      down = Downloader()
      down.Setting('C:\\Users\\조나단\\Desktop\\Test\\')
-     down.GetSearchPage('아니 진자 제발 적은 것좀 나와라')
+     down.GetSearchPage('롤')
      down.Download()
