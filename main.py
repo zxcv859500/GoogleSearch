@@ -10,8 +10,14 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5 import uic
 from Download_Manager import *
 import FilePDFManager
+import threading
 
 class Ui_MainWindow(object):
+
+
+    def __init__(self):
+
+        self.Running = False
 
     def setupUi(self, MainWindow):
 
@@ -91,16 +97,25 @@ class Ui_MainWindow(object):
             QtWidgets.QMessageBox.about(MainWindow, 'Error', '폴더를 선택해주세요')
 
         else:
-            download_manager = Download_Manager()
-            while(1):
-                self.refresh_list()
-                flag = download_manager.download()
+            if self.Running == False:
+                self.Running = True
+                t = threading.Thread(target=self.download)
+                t.start()
 
-                if flag == True:
-                    download_manager.page.DriverQuit()
-                    break
+    def download(self):
 
+        path = self.textEdit_File.text().replace('/', '\\')
+        keyword = self.textEdit_Search.text()
+        download_manager = Download_Manager(keyword=keyword, path=path)
 
+        while (1):
+            ######self.refresh_list()
+            flag = download_manager.download()
+
+            if flag == True:
+                download_manager.page.DriverQuit()
+                self.Running = False
+                break
 
     def filebtn_click(self):
 
