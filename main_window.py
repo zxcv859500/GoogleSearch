@@ -105,10 +105,24 @@ class Ui_MainWindow(object):
         self.pushButton__Remove.setText(_translate("MainWindow", "삭제"))
         self.pushButton_OpenFile.setText(_translate("MainWindow", "열기"))
 
-        #TODO
+        ######
+        #do
+        ######
         self.toolButton_Path.clicked.connect(self.filebtn_click)
+        self.pushButton_Search.clicked.connect(self.searchbtn_click)
+        self.pushButton_OpenFile.clicked.connect(self.openbtn_click)
+
+        self.Running = False
+        self.Stop = False
 
     def searchbtn_click(self):
+
+        if self.Running == True:
+
+            self.Stop = True
+            self.Running = False
+            self.label_progress.setText('STOP')
+            return False
 
         if self.lineEdit_Search.text() == '':
             QtWidgets.QMessageBox.about(MainWindow, 'Error', '빈 칸을 채워주세요')
@@ -119,23 +133,36 @@ class Ui_MainWindow(object):
         else:
             if self.Running == False:
                 self.Running = True
+                self.label_progress.setText('Downloading...')
                 t = threading.Thread(target=self.download)
+                t.daemon = True
                 t.start()
 
     def download(self):
 
         path = self.lineEdit_Path.text().replace('/', '\\')
         keyword = self.lineEdit_Search.text()
-        download_manager = Download_Manager(keyword=keyword, path=path)
+        self.download_manager = Download_Manager(keyword=keyword, path=path)
 
         while (1):
-            ######self.refresh_list()
-            flag = download_manager.download()
+            self.refresh_list()
+            flag = self.download_manager.download()
+
+            if self.Stop == True:
+                self.Stop = False
+                break
 
             if flag == True:
-                download_manager.page.DriverQuit()
+                self.download_manager.page.DriverQuit()
                 self.Running = False
+                self.label_progress.setText('Done!')
                 break
+
+    def refresh_list(self):
+
+        self.model.refresh()
+        self.listView.setModel(self.model)
+        self.listView.setRootIndex(self.model.index(self.path))
 
     def filebtn_click(self):
 
@@ -151,6 +178,13 @@ class Ui_MainWindow(object):
 
     def extractbtn_click(self):
         pass
+
+    def openbtn_click(self):
+
+        print(self.listView.currentIndex().data())
+
+    def __del__(self):
+        self.download_manager.page.DriverQuit()
 
 if __name__ == "__main__":
     import sys
