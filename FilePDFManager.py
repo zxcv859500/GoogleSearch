@@ -3,10 +3,14 @@ from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
 from pdfminer.pdfpage import PDFPage
 from pdfminer.converter import TextConverter
 from pdfminer.layout import LAParams
+import pyPdf
 import io
+import re
 
-def Extractor(file, keyword):
+#TODO http://dgkim5360.tistory.com/entry/python-pdfminer-convert-pdf-to-html-txt
 
+def Extractor(path, filename, keyword, line):
+    file = path + '\\' + filename
     fp = open(file, 'rb')
     rsrcmgr = PDFResourceManager()
     retstr = io.StringIO()
@@ -19,16 +23,30 @@ def Extractor(file, keyword):
         interpreter.process_page(page)
         data = retstr.getvalue()
 
-    texts = str(data)
-    print(texts)
-    print(texts.split('.'))
-
+    sover = ''
     res = []
+    for text in data:
+        sover = sover +str(text)
+    sover = sover.replace('\t', ' ')
+    sover = sover.replace('\n\n', '\n')
 
-    for text in texts.split('.'):
-        if keyword in text:
-            res.append(text)
-            print(text)
+    texts = sover.split('\n')
+    number = texts.__len__()
+
+    passnum = 0
+    for idx in range(number):
+        if passnum != 0:
+            passnum -= 1
+            continue
+
+        temp = ''
+        if keyword in texts[idx]:
+            print(texts[idx])
+            for idx2 in range(idx, idx + line):
+                temp += texts[idx2]
+                passnum = line
+            res.append(temp)
+
 
     return res
 
@@ -40,7 +58,7 @@ def GetFileList(path):
 
 def mktext(path, filename, data):
 
-    with open(path+'\\'+filename+'.txt', 'w') as f:
+    with open(path+'\\'+filename+'.txt', 'w', encoding='UTF-8') as f:
         for line in data:
             f.write(line)
 
@@ -68,4 +86,8 @@ def GetCleanFileList(path):
 
 if __name__ == '__main__':
     #Extractor('C:\\Users\\조나단\\Desktop\\Test\\KLC_대회규정.pdf', '퍼즈')
-    GetCleanFileList('C:\\Users\\조나단\\Desktop\\Test')
+    #GetCleanFileList('C:\\Users\\조나단\\Desktop\\Test')
+    data = Extractor('C:\\Users\\조나단\\Desktop\\Test\\', '하이브리드롤_기반_대면적_핫엠보싱_장비.pdf',
+                     '고기능화', 2)
+    mktext('C:\\Users\\조나단\\Desktop\\Test\\', '하이브리드롤_기반_대면적_핫엠보싱_장비'
+           , data)

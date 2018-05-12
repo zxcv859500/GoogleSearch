@@ -61,6 +61,18 @@ class Ui_MainWindow(object):
         self.lineEdit_Extract = QtWidgets.QLineEdit(self.centralwidget)
         self.lineEdit_Extract.setGeometry(QtCore.QRect(70, 500, 113, 20))
         self.lineEdit_Extract.setObjectName("lineEdit_Extract")
+        #self.label_Extract_Line
+        self.label_Extract_Line = QtWidgets.QLabel(self.centralwidget)
+        self.label_Extract_Line.setGeometry(QtCore.QRect(10, 530, 121, 20))
+        self.label_Extract_Line.setObjectName("label_Extract_Line")
+        #self.lineEdit_Extract_Line
+        self.lineEdit_Extract_Line = QtWidgets.QLineEdit(self.centralwidget)
+        self.lineEdit_Extract_Line.setGeometry(QtCore.QRect(70, 530, 113, 20))
+        self.lineEdit_Extract_Line.setObjectName("lineEdit_Extract_Line")
+        #self.pushButton_ExtractnOpen
+        self.pushButton_ExtractnOpen = QtWidgets.QPushButton(self.centralwidget)
+        self.pushButton_ExtractnOpen.setGeometry(QtCore.QRect(190, 530, 75, 23))
+        self.pushButton_ExtractnOpen.setObjectName("pushButton_ExtractnOpen")
         self.pushButton_Extract = QtWidgets.QPushButton(self.centralwidget)
         self.pushButton_Extract.setGeometry(QtCore.QRect(190, 500, 75, 23))
         self.pushButton_Extract.setObjectName("pushButton_Extract")
@@ -104,6 +116,9 @@ class Ui_MainWindow(object):
         self.pushButton_Extract.setText(_translate("MainWindow", "추출"))
         self.pushButton__Remove.setText(_translate("MainWindow", "삭제"))
         self.pushButton_OpenFile.setText(_translate("MainWindow", "열기"))
+        self.label_Extract_Line.setText(_translate("MainWindow", "줄 수"))
+        self.pushButton_ExtractnOpen.setText(_translate("MainWindow", "추출 후 열기"))
+        self.lineEdit_Extract_Line.setText(_translate("MainWindow", '1'))
 
         ######
         #do
@@ -111,6 +126,8 @@ class Ui_MainWindow(object):
         self.toolButton_Path.clicked.connect(self.filebtn_click)
         self.pushButton_Search.clicked.connect(self.searchbtn_click)
         self.pushButton_OpenFile.clicked.connect(self.openbtn_click)
+        self.pushButton__Remove.clicked.connect(self.deletebtn_click)
+        self.pushButton_Extract.clicked.connect(self.extractbtn_click)
 
         self.Running = False
         self.Stop = False
@@ -174,10 +191,23 @@ class Ui_MainWindow(object):
         self.listView.setRootIndex(self.model.index(self.path))
 
     def deletebtn_click(self):
-        pass
+
+        filename = self.listView.currentIndex().data()
+        FilePDFManager.DeleteFile(self.path, filename)
+        self.refresh_list()
 
     def extractbtn_click(self):
-        pass
+
+        if(self.lineEdit_Extract.text() == ''):
+            QtWidgets.QMessageBox.about(MainWindow, 'Error', '빈 칸을 채워주세요')
+            return False
+
+        filename = self.listView.currentIndex().data()
+        line = int(self.lineEdit_Extract_Line.text())
+        data = FilePDFManager.Extractor(self.path, filename,
+                                        self.lineEdit_Extract.text(), line)
+        filename = filename.split('.')[0]
+        FilePDFManager.mktext(self.path, filename, data)
 
     def openbtn_click(self):
 
@@ -195,3 +225,4 @@ if __name__ == "__main__":
     MainWindow.show()
     sys.exit(app.exec_())
 
+#TODO 검색 히스토리 확인 기능 만들기, 추출하자마자 열기 버튼 만들기
