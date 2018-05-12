@@ -1,17 +1,26 @@
 from Downloader import *
+import datetime
 
 class Download_Manager():
 
-    def __init__(self, path, keyword):
+    def __init__(self, path, keyword, page_limit):
         self.page = Downloader()
         self.page.Setting(path)
         self.page.GetSearchPage(keyword)
         self.page.Page_Surf()
-
+        self.page_cnt = 1
+        self.page_limit = page_limit
         self.Error_Count = 0
         self.idx = 1
 
+        with open('log.txt', 'a', encoding='UTF-8') as f:
+            f.write('[{}] SEARCHING KEYWORD : {}\n'
+                    .format(datetime.datetime.now(), keyword))
+
     def download(self):
+
+        if self.page_cnt > self.page_limit:
+            return True
 
         if self.idx >= 11:
 
@@ -22,6 +31,7 @@ class Download_Manager():
                 return True
             print('Next page')
             self.page.Click_NextBtn()
+            self.page_cnt += 1
             self.page.Page_Surf()
 
         print('Downloading {}'.format(self.idx))

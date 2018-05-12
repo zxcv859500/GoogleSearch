@@ -6,6 +6,7 @@ from pdfminer.layout import LAParams
 import pyPdf
 import io
 import re
+import threading
 
 #TODO http://dgkim5360.tistory.com/entry/python-pdfminer-convert-pdf-to-html-txt
 
@@ -60,7 +61,7 @@ def mktext(path, filename, data):
 
     with open(path+'\\'+filename+'.txt', 'w', encoding='UTF-8') as f:
         for line in data:
-            f.write(line)
+            f.write(line + '\n')
 
 def DeleteExcept(filename):
 
@@ -83,6 +84,10 @@ def GetCleanFileList(path):
     for file in file_list:
 
         DeleteExcept(path + '\\' + file)
+
+def OpenFile(path, filename):
+
+    os.system(path + '\\' + filename)
 
 if __name__ == '__main__':
     #Extractor('C:\\Users\\조나단\\Desktop\\Test\\KLC_대회규정.pdf', '퍼즈')
