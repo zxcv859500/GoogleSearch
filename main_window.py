@@ -96,6 +96,10 @@ class Ui_MainWindow(object):
         self.line.setFrameShape(QtWidgets.QFrame.HLine)
         self.line.setFrameShadow(QtWidgets.QFrame.Sunken)
         self.line.setObjectName("line")
+        #pushButton_mkdir
+        self.pushButton_mkdir = QtWidgets.QPushButton(self.centralwidget)
+        self.pushButton_mkdir.setGeometry(QtCore.QRect(300, 40, 75, 23))
+        self.pushButton_mkdir.setObjectName('pushButton_mkdir')
         self.model = QtWidgets.QDirModel()
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
@@ -130,6 +134,7 @@ class Ui_MainWindow(object):
         self.lineEdit_Extract_Line.setText(_translate("MainWindow", '1'))
         self.pushButton_Log.setText(_translate("MainWindow", "검색 기록"))
         self.pushButton_Refresh.setText(_translate("MainWindow", "새로고침"))
+        self.pushButton_mkdir.setText(_translate("MainWindow", "폴더 적용"))
 
         ######
         #do
@@ -142,22 +147,40 @@ class Ui_MainWindow(object):
         self.pushButton_ExtractnOpen.clicked.connect(self.extractnopenbtn_click)
         self.pushButton_Log.clicked.connect(self.OpenLog)
         self.pushButton_Refresh.clicked.connect(self.refresh_list)
+        self.pushButton_mkdir.clicked.connect(self.mkdir)
         #self.lineEdit_FileSearch.textChanged.connect(self.filter_changed)
         self.Running = False
         self.Stop = False
+
+        self.garbage = []
+
+        if os.path.isdir('Extract') == False:
+            os.mkdir('Extract')
 
     #def filter_changed(self):
     #    self.filter = self.lineEdit_FileSearch.text()
     #    self.refresh_list()
 
-    def OpenLog(self):
-        f = open('log.txt', 'a')
-        f.close()
+    def mkdir(self):
 
-        path = os.path.dirname(os.path.abspath(__file__)).replace('/', '\\')
-        t = threading.Thread(target=FilePDFManager.OpenFile,
-                             args=(path, 'log.txt'))
-        t.start()
+        keyword = self.lineEdit_Search.text()
+        if os.path.isdir(self.path + '\\' + keyword) == False:
+            os.mkdir(self.path + '\\' + keyword)
+        self.lineEdit_Path.setText(self.path + '\\' + keyword)
+        self.path = self.lineEdit_Path.text()
+        self.refresh_list()
+
+    def OpenLog(self):
+
+        path = os.path.dirname( os.path.abspath( __file__ ) ).replace('/', '\\')
+        FilePDFManager.OpenFile(path, 'log.txt')
+        #f = open('log.txt', 'a')
+        #f.close()
+
+        #path = os.path.dirname(os.path.abspath(__file__)).replace('/', '\\')
+        #t = threading.Thread(target=FilePDFManager.OpenFile,
+        #                    args=(path, 'log.txt'))
+        #t.start()
 
     def searchbtn_click(self):
 
@@ -260,6 +283,7 @@ class Ui_MainWindow(object):
                                         self.lineEdit_Extract.text(), line)
         filename = filename.split('.')[0]
         FilePDFManager.mktext(self.path, filename, data)
+        self.refresh_list()
 
     def extractnopenbtn_click(self):
 
@@ -285,21 +309,20 @@ class Ui_MainWindow(object):
                                         self.lineEdit_Extract.text(), line)
         filename = filename.split('.')[0]
         FilePDFManager.mktext(self.path, filename, data)
+        filename = filename + '.txt'
+        self.refresh_list()
 
-        t = threading.Thread(target=FilePDFManager.OpenFile,
-                             args=(self.path, filename))
-        t.start()
+        FilePDFManager.OpenFile(self.path, filename)
 
     def openbtn_click(self):
 
         filename = self.listView.currentIndex().data()
-        print(self.listView.currentIndex().data())
-        t = threading.Thread(target=FilePDFManager.OpenFile,
-                             args=(self.path, filename))
-        t.start()
-        #FilePDFManager.OpenFile(self.path, filename)
+
+        FilePDFManager.OpenFile(self.path, filename)
 
     def __del__(self):
+        for file in self.garbage:
+            os.system('del ' + file)
         self.download_manager.page.DriverQuit()
 
 if __name__ == "__main__":

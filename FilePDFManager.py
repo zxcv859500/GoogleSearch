@@ -3,10 +3,12 @@ from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
 from pdfminer.pdfpage import PDFPage
 from pdfminer.converter import TextConverter
 from pdfminer.layout import LAParams
-import pyPdf
 import io
+import ctypes
+import subprocess
 import re
 import threading
+from PyPDF2 import PdfFileWriter, PdfFileReader
 
 #TODO http://dgkim5360.tistory.com/entry/python-pdfminer-convert-pdf-to-html-txt
 
@@ -61,7 +63,7 @@ def mktext(path, filename, data):
 
     with open(path+'\\'+filename+'.txt', 'w', encoding='UTF-8') as f:
         for line in data:
-            f.write(line + '\n')
+            f.write(line + '\n\n')
 
 def DeleteExcept(filename):
 
@@ -87,11 +89,19 @@ def GetCleanFileList(path):
 
 def OpenFile(path, filename):
 
-    os.system(path + '\\' + filename)
+    file = path + '\\' + filename
+    exname = file.split('.')[-1]
+    if exname == 'txt':
+        subprocess.Popen(["notepad.exe", file])
+    elif exname == 'pdf':
+        subprocess.Popen(["C:\Program Files (x86)\Google\Chrome\Application\chrome.exe", file])
+
+    #ctypes.windll.shell32.ShellExecuteA(0, 'open', file, None, None, 1)
 
 if __name__ == '__main__':
     #Extractor('C:\\Users\\조나단\\Desktop\\Test\\KLC_대회규정.pdf', '퍼즈')
     #GetCleanFileList('C:\\Users\\조나단\\Desktop\\Test')
+    OpenFile('C:\\Users\\조나단\\Desktop\\Test\\', '하이브리드롤_기반_대면적_핫엠보싱_장비.pdf')
     data = Extractor('C:\\Users\\조나단\\Desktop\\Test\\', '하이브리드롤_기반_대면적_핫엠보싱_장비.pdf',
                      '고기능화', 2)
     mktext('C:\\Users\\조나단\\Desktop\\Test\\', '하이브리드롤_기반_대면적_핫엠보싱_장비'
